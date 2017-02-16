@@ -1,13 +1,13 @@
 FROM quay.io/orgsync/flyway:1.0
 
-ENV VAULT_VERSION=0.6.2
-ENV VAULT_DIR=/vault
+# Install jq
+RUN apt-get update \
+  && apt-get install -y jq \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir $VAULT_DIR && \
-  cd $VAULT_DIR && \
-  wget -O vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip && \
-  unzip vault.zip && \
-  mv vault /usr/local/bin && \
-  rm -rf $VAULT_DIR
+COPY flyway-entrypoint.sh /usr/local/bin/flyway-entrypoint.sh
 
-ENTRYPOINT ["/bin/bash"]
+WORKDIR /code
+
+ENTRYPOINT ["flyway-entrypoint.sh"]
+CMD ["--help"]
